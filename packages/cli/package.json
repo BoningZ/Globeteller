@@ -1,0 +1,11 @@
+{
+  "name": "@globeteller/cli",
+  "version": "0.0.1",
+  "bin": { "globeteller": "dist/index.js" },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts"
+  },
+  "dependencies": {
+    "@globeteller/core": "file:../core"  
+  }
+}

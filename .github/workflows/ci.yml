@@ -1,0 +1,19 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'            # ← 改为 npm 缓存
+
+      - run: npm ci               # 安装所有工作区依赖（锁文件一致）
+
+      - run: npm run build --workspaces
