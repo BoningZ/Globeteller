@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "bin": { "globeteller": "dist/index.js" },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts"
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "lint": "echo \"No linting configured\" && exit 0",
+    "test": "echo \"No tests specified\" && exit 0",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@globeteller/core": "file:../core"  

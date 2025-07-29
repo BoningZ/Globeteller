@@ -7,13 +7,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'            # ← 改为 npm 缓存
+          cache: 'npm'
 
-      - run: npm ci               # 安装所有工作区依赖（锁文件一致）
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run build --workspaces
+      - name: Type check
+        run: npm run type-check --workspaces
+
+      - name: Lint code
+        run: npm run lint --workspaces
+
+      - name: Run tests
+        run: npm run test --workspaces
+
+      - name: Build packages
+        run: npm run build --workspaces
