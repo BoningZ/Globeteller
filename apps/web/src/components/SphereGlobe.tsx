@@ -138,13 +138,11 @@ export function SphereGlobe({ trip, currentTime }: SphereGlobeProps) {
         controlsRef.current.update();
       }
 
-      // 缓慢旋转地球
-      if (earthRef.current) {
-        earthRef.current.rotation.y += 0.005;
-      }
+      // 移除自动旋转，让地球保持静止
+      // 只有在用户交互时才旋转
 
-      // 旋转星空
-      stars.rotation.y += 0.001;
+      // 缓慢旋转星空背景
+      stars.rotation.y += 0.0005;
 
       renderer.render(scene, camera);
     };
