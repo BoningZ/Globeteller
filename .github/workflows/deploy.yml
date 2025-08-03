@@ -31,7 +31,8 @@ jobs:
         run: npm ci
 
       - name: Build web app
-        run: npm run build --workspace=web
+        run: npm run build
+        working-directory: apps/web
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

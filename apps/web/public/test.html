@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Globeteller 测试页面</title>
+    <title>Globeteller 部署测试</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,57 +24,90 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .success {
+            color: #4ade80;
+        }
+        .error {
+            color: #f87171;
+        }
         .demo-link {
             display: inline-block;
             background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 15px 30px;
+            padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
-            margin: 10px;
-            transition: background 0.3s;
+            margin: 10px 5px;
         }
         .demo-link:hover {
             background: rgba(255, 255, 255, 0.3);
-        }
-        .download-section {
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌍 Globeteller 测试页面</h1>
+        <h1>🌍 Globeteller 部署测试</h1>
         
-        <p>如果你看到这个页面，说明 GitHub Pages 部署成功了！</p>
-        
-        <div class="download-section">
-            <h3>📁 下载测试数据</h3>
-            <p>点击下面的链接下载示例 trip.json 文件，然后在主应用中拖入测试：</p>
-            <a href="data:application/json;charset=utf-8;base64,eyJ0aXRsZSI6IkRlbW8gVHJpcCIsImxhbmd1YWdlIjoiemgiLCJzZWdtZW50cyI6W3siY29vcmRpbmF0ZXMiOlsxMTYuNCwzOS45XSxbMTIxLjQ3LDMxLjIzXSxbMTM5LjY5LDM1LjY4XV0sInRpbWUiOiIyMDI0LTA4LTAxVDAwOjAwOjAwWiIsInRyYW5zcG9ydCI6InBsYW5lIiwibm90ZSI6IuS4reWbveKAlOaXp+aLieKAlOaTjeiJsiJ9XX0=" 
-               download="trip.json" 
-               class="demo-link">
-                📥 下载 trip.json
-            </a>
+        <div class="test-section">
+            <h2>✅ 部署状态</h2>
+            <p>如果你能看到这个页面，说明 GitHub Pages 部署成功！</p>
         </div>
-        
-        <div class="download-section">
-            <h3>🔗 主应用链接</h3>
-            <a href="./" class="demo-link">🚀 进入主应用</a>
+
+        <div class="test-section">
+            <h2>📁 测试文件</h2>
+            <p>你可以下载这个示例 trip.json 文件来测试应用：</p>
+            <a href="data:application/json;charset=utf-8;base64,eyJ0aXRsZSI6ICJEZW1vIFRyaXAiLCAibGFuZ3VhZ2UiOiAiemgiLCAic2VnbWVudHMiOiBbeyJjb29yZGluYXRlcyI6IFtbMTE2LjQsIDM5LjldLCBbMTIxLjQ3LCAzMS4yM10sIFsxMzkuNjksIDM1LjY4XV0sICJ0aW1lIjogIjIwMjQtMDgtMDFUMDA6MDA6MDBaIiwgInRyYW5zcG9ydCI6ICJwbGFuZSIsICJub3RlIjogIuS4reWbve+8muWkqeaApO+8muWkpOWJjSJ9XX0=" download="demo-trip.json" class="demo-link">下载示例 trip.json</a>
         </div>
-        
-        <div class="download-section">
-            <h3>📋 使用说明</h3>
+
+        <div class="test-section">
+            <h2>🔗 应用链接</h2>
+            <p>点击下面的链接访问主应用：</p>
+            <a href="/Globeteller/" class="demo-link">访问 Globeteller 应用</a>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 使用说明</h2>
             <ol>
-                <li>下载上面的 trip.json 文件</li>
-                <li>点击"进入主应用"</li>
-                <li>将下载的文件拖入应用</li>
-                <li>查看 3D 地球上的旅行轨迹！</li>
+                <li>点击上面的链接访问主应用</li>
+                <li>下载示例 trip.json 文件</li>
+                <li>将文件拖拽到应用界面中</li>
+                <li>查看你的旅行轨迹可视化效果！</li>
             </ol>
         </div>
+
+        <div class="test-section">
+            <h2>🐛 故障排除</h2>
+            <p>如果主应用无法访问，请检查：</p>
+            <ul>
+                <li>GitHub Pages 设置是否正确</li>
+                <li>GitHub Actions 是否成功运行</li>
+                <li>仓库是否为公开仓库</li>
+            </ul>
+        </div>
     </div>
+
+    <script>
+        // 简单的功能测试
+        console.log('Globeteller 测试页面加载成功');
+        
+        // 检查是否能访问主应用
+        fetch('/Globeteller/')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ 主应用可以访问');
+                } else {
+                    console.log('❌ 主应用无法访问');
+                }
+            })
+            .catch(error => {
+                console.log('❌ 主应用访问失败:', error);
+            });
+    </script>
 </body>
 </html> 

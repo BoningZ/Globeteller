@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globeteller 部署调试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            border-left: 4px solid #4ade80;
+        }
+        .error {
+            border-left-color: #f87171;
+        }
+        .warning {
+            border-left-color: #fbbf24;
+        }
+        .info {
+            border-left-color: #60a5fa;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success { background: #4ade80; color: #000; }
+        .status.error { background: #f87171; color: #000; }
+        .status.warning { background: #fbbf24; color: #000; }
+        .status.info { background: #60a5fa; color: #000; }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .test-button {
+            background: #4ade80;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Globeteller 部署调试工具</h1>
+    
+    <div class="debug-section info">
+        <h2>📊 当前状态</h2>
+        <p>页面加载时间: <span id="loadTime"></span></p>
+        <p>当前 URL: <span id="currentUrl"></span></p>
+        <p>用户代理: <span id="userAgent"></span></p>
+    </div>
+
+    <div class="debug-section">
+        <h2>🔗 链接测试</h2>
+        <button class="test-button" onclick="testMainApp()">测试主应用</button>
+        <button class="test-button" onclick="testAssets()">测试资源文件</button>
+        <button class="test-button" onclick="testRedirects()">测试重定向</button>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>📁 文件结构检查</h2>
+        <div id="fileStructure"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🌐 网络请求</h2>
+        <div id="networkRequests"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🐛 控制台日志</h2>
+        <div id="consoleLog"></div>
+    </div>
+
+    <script>
+        // 记录页面加载时间
+        document.getElementById('loadTime').textContent = new Date().toLocaleString();
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+
+        // 测试主应用
+        async function testMainApp() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '<p>正在测试主应用...</p>';
+            
+            try {
+                const response = await fetch('/Globeteller/');
+                if (response.ok) {
+                    results.innerHTML += '<p><span class="status success">✅ 主应用可访问</span></p>';
+                } else {
+                    results.innerHTML += `<p><span class="status error">❌ 主应用不可访问 (${response.status})</span></p>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p><span class="status error">❌ 主应用访问失败: ${error.message}</span></p>`;
+            }
+        }
+
+        // 测试资源文件
+        async function testAssets() {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<p>正在测试资源文件...</p>';
+            
+            const assets = [
+                '/Globeteller/assets/index-CY6j6W4Y.js',
+                '/Globeteller/assets/index-raWDXl4h.css',
+                '/Globeteller/vite.svg'
+            ];
+            
+            for (const asset of assets) {
+                try {
+                    const response = await fetch(asset);
+                    if (response.ok) {
+                        results.innerHTML += `<p><span class="status success">✅ ${asset}</span></p>`;
+                    } else {
+                        results.innerHTML += `<p><span class="status error">❌ ${asset} (${response.status})</span></p>`;
+                    }
+                } catch (error) {
+                    results.innerHTML += `<p><span class="status error">❌ ${asset}: ${error.message}</span></p>`;
+                }
+            }
+        }
+
+        // 测试重定向
+        function testRedirects() {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<p>正在测试重定向...</p>';
+            
+            // 测试 SPA 重定向
+            const testUrl = '/Globeteller/test-path';
+            const currentPath = window.location.pathname;
+            
+            if (currentPath.includes('/Globeteller/')) {
+                results.innerHTML += '<p><span class="status success">✅ 基础路径正确</span></p>';
+            } else {
+                results.innerHTML += '<p><span class="status warning">⚠️ 基础路径可能不正确</span></p>';
+            }
+        }
+
+        // 检查文件结构
+        async function checkFileStructure() {
+            const structure = document.getElementById('fileStructure');
+            const files = [
+                '/Globeteller/',
+                '/Globeteller/index.html',
+                '/Globeteller/assets/',
+                '/Globeteller/404.html',
+                '/Globeteller/_redirects'
+            ];
+            
+            structure.innerHTML = '<p>正在检查文件结构...</p>';
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        structure.innerHTML += `<p><span class="status success">✅ ${file}</span></p>`;
+                    } else {
+                        structure.innerHTML += `<p><span class="status error">❌ ${file} (${response.status})</span></p>`;
+                    }
+                } catch (error) {
+                    structure.innerHTML += `<p><span class="status error">❌ ${file}: ${error.message}</span></p>`;
+                }
+            }
+        }
+
+        // 记录网络请求
+        function logNetworkRequests() {
+            const network = document.getElementById('networkRequests');
+            network.innerHTML = '<p>网络请求日志:</p>';
+            
+            // 监听 fetch 请求
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                const url = args[0];
+                network.innerHTML += `<p><span class="status info">🌐 ${url}</span></p>`;
+                return originalFetch.apply(this, args);
+            };
+        }
+
+        // 记录控制台日志
+        function logConsole() {
+            const consoleLog = document.getElementById('consoleLog');
+            const originalLog = console.log;
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            
+            console.log = function(...args) {
+                consoleLog.innerHTML += `<p><span class="status info">📝 ${args.join(' ')}</span></p>`;
+                originalLog.apply(console, args);
+            };
+            
+            console.error = function(...args) {
+                consoleLog.innerHTML += `<p><span class="status error">❌ ${args.join(' ')}</span></p>`;
+                originalError.apply(console, args);
+            };
+            
+            console.warn = function(...args) {
+                consoleLog.innerHTML += `<p><span class="status warning">⚠️ ${args.join(' ')}</span></p>`;
+                originalWarn.apply(console, args);
+            };
+        }
+
+        // 初始化
+        window.addEventListener('load', function() {
+            checkFileStructure();
+            logNetworkRequests();
+            logConsole();
+            
+            console.log('Globeteller 调试工具已加载');
+            console.log('当前 URL:', window.location.href);
+            console.log('用户代理:', navigator.userAgent);
+        });
+    </script>
+</body>
+</html> 
