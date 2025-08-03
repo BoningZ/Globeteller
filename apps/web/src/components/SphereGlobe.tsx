@@ -60,8 +60,7 @@ export function SphereGlobe({ trip, currentTime }: SphereGlobeProps) {
 
     // 创建 OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.enableDamping = false; // 禁用阻尼，防止自动旋转
     controls.screenSpacePanning = false;
     controls.minDistance = 1.5;
     controls.maxDistance = 10;
