@@ -76,29 +76,15 @@ export function SphereGlobe({ trip, currentTime }: SphereGlobeProps) {
     // 创建地球材质（使用本地 JPG 纹理）
     const textureLoader = new THREE.TextureLoader();
     
-    // 使用本地 JPG 地球纹理，带错误处理
-    // 如果本地文件不存在，会自动使用在线版本作为备用
+    // 使用本地 JPG 地球纹理
     const earthTexture = textureLoader.load(
-      '/textures/earth-texture.jpg',
+      '/Globeteller/textures/earth-texture.jpg',
       undefined, // onLoad
       undefined, // onProgress
-      () => {
-        // onError - 纹理加载失败时使用在线版本
-        console.log('本地纹理加载失败，使用在线版本');
-        textureLoader.load(
-          'https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg',
-          (texture) => {
-            material.map = texture;
-            material.needsUpdate = true;
-          },
-          undefined,
-          () => {
-            // 如果在线版本也失败，使用纯色
-            console.log('在线纹理也失败，使用纯色');
-            material.map = null;
-            material.color.setHex(0x4A90E2);
-          }
-        );
+      (error) => {
+        // onError - 纹理加载失败时的处理
+        console.error('地球纹理加载失败:', error);
+        // 不使用任何 fallback，保持错误状态
       }
     );
     
