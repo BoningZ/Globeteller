@@ -1,0 +1,200 @@
+# Globeteller 项目上下文
+
+## 项目概述
+
+Globeteller 是一个 **纯 TypeScript** 的可视化工具集，可将旅行数据 → 3-D 地球轨迹动画，并可（本地模式下）导出视频、调用 LLM 生成旅行日志。
+
+```
+核心路径 → 动画（Web）   ┬→ AI 日志 (OpenAI)
+                      └→ 帧序列 → FFmpeg → MP4/WebM（CLI）
+```
+
+Monorepo 目录：
+
+```
+Globeteller/
+├─ apps/web/          # React 前端应用 (Vite)
+├─ packages/core/     # 工具库：trip 解析 / geo / ai / deck
+├─ packages/cli/      # CLI: generate-log | render-globe | encode-video
+├─ trips/             # 示例 trip.json & 照片
+└─ output/            # 渲染产物 (git-ignored)
+```
+
+---
+
+## 技术栈
+
+| 领域       | 依赖                                             |
+| -------- | ---------------------------------------------- |
+| 前端       | React 19 · Vite · Tailwind                     |
+| 3-D 地球   | @deck.gl/core / react · GlobeView · TripsLayer |
+| AI / LLM | OpenAI SDK（可扩展 GPT-4 Vision / CLIP-ONNX）       |
+| CLI      | Puppeteer (无头 Chrome) · ffmpeg-static          |
+| 构建       | TypeScript 5 · tsup (CLI) · vite build (web)   |
+| Node 要求  | **≥ 20**                                       |
+| 包管理      | npm 10 workspaces（无 pnpm/yarn 依赖）              |
+
+---
+
+## Build Mode 与全局标志
+
+| Mode    | 用途               | 行为                                |
+| ------- | ---------------- | --------------------------------- |
+| `demo`  | GitHub Pages 演示  | 剪掉 GPT / FFmpeg / File-System-API |
+| `local` | 桌面浏览器 / Electron | 全功能 (GPT、Vision、写盘)               |
+
+在 `vite.config.ts` 内注入：
+
+```ts
+declare const __DEMO__:  boolean;  // demo 构建
+declare const __LOCAL__: boolean;  // local 构建
+```
+
+---
+
+## trip.json Schema (v0)
+
+```ts
+interface Segment {
+  coordinates: [number, number][]; // [lon, lat] 折线
+  time: string;                    // ISO-8601
+  transport?: 'train' | 'plane' | 'car' | 'walk';
+  photo?: string;
+  note?: string;
+}
+interface Trip {
+  title: string;
+  language?: string;               // 'en' | 'zh' ...
+  segments: Segment[];
+}
+```
+
+---
+
+## 开发规范
+
+1. **TypeScript 严格模式**，ESM 优先
+2. ESLint + Prettier，一次性在 CI 过关
+3. React 全函数组件＋Hooks
+4. 中文注释、变量英文、函数动词开头
+5. Workspaces 依赖通过 `workspace:*` 引用
+
+---
+
+## 核心包说明
+
+| 包 / 模块                | 作用                                 |
+| --------------------- | ---------------------------------- |
+| `core/trip/parser.ts` | `parseTrip(json):Trip` – 校验 & 时间排序 |
+| `core/geo/exif.ts`    | 浏览器提取照片 EXIF(GPS/时间)               |
+| `core/ai/openai.ts`   | OpenAI 调用封装                        |
+| `core/deck/layers.ts` | 动态构造 TripsLayer、颜色映射               |
+
+---
+
+## CLI 命令速览
+
+```bash
+globeteller generate-log   trips/foo/trip.json      # GPT 游记
+globeteller render-globe   trips/foo/trip.json      # Puppeteer → PNG 帧
+globeteller encode-video   --frames frames --o out.mp4
+```
+
+---
+
+## CI / CD
+
+| Workflow      | 动作                                                  |
+| ------------- | --------------------------------------------------- |
+| `ci.yml`      | lint → tsc → vitest → `npm run build --workspaces`  |
+| `pages.yml`   | apps/web `npm run build:demo` → Deploy GitHub Pages |
+| `release.yml` | semantic-release → 发布 `@globeteller/cli`            |
+
+---
+
+## MVP 任务列表（Demo 必备）
+
+完成以下 **4** 项即算 MVP 成功（线上 Demo 可用）：
+
+1. **拖入 `trip.json` → `parseTrip` → `useState` 持有**
+2. **`Globe.tsx`：DeckGL + GlobeView + TripsLayer 渲染首段轨迹**
+3. **简单动画**：`setInterval` 每 16 ms 递增 `currentTime`
+4. **示例数据**：在 `trips/demo/trip.json` 中放北京→上海→东京折线
+
+```json
+{ "title":"Demo","segments":[
+    { "coordinates":[[116.4,39.9],[121.47,31.23],[139.69,35.68]],
+      "time":"2024-08-01T00:00:00Z" }]}
+```
+
+运行：
+
+```bash
+npm run dev --workspace=@globeteller/web -- --mode local
+```
+
+拖入示例文件应看到轨迹在旋转地球上闪动。Push 到 `main` 后 Pages 即上线。
+
+---
+
+## 后续迭代关键点
+
+* **Timeline 滑条、多 Segment 颜色**：可视化交互更丰富
+* **EXIF → trip.json 自动生成**：照片一键转换行程
+* **OpenAI 日志生成**（CLI & 前端）：自动游记、多语言
+* **Puppeteer + FFmpeg 视频导出**：生成 MP4/WebM
+* **（可选）离线 CLIP 地标识别、轨迹聚类、Faiss 检索**：算法与多模态实验
+
+---
+
+---
+
+## 代码风格
+
+* 函数/组件命名：动词或名词 + 后缀 `…View`, `…Layer`
+* 文件夹命名：小写短横线
+* React 事件回调 `onXxx={handleXxx}`
+* 拒绝魔数，统一常量文件 `constants.ts`
+
+---
+
+## 开发步骤（推荐顺序）
+
+1. **初始化依赖**
+
+   ```bash
+   npm ci   # 根目录一次性安装 workspaces
+   ```
+2. **MVP 实现**
+
+   * 创建 `core/types.ts`, `core/trip/parser.ts`
+   * 在 `apps/web` 添加 `FileDrop`, `Globe.tsx`, `App` 状态
+   * 放置 `trips/demo/trip.json` 并本地 `npm run dev --workspace=@globeteller/web -- --mode local` 验证
+3. **前端时间轴**
+
+   * 新建 `Timeline.tsx` 滑块，绑定 `currentTime`
+4. **多段轨迹 & 颜色**
+
+   * 给 `Segment.transport` 着色映射，支持多条 `TripsLayer`
+5. **EXIF → trip.json**
+
+   * `core/geo/exif.ts` 读取照片元数据生成内存 Trip
+6. **AI 日志 CLI**
+
+   * `cli/generate-log.ts` 调 OpenAI，根据 `language` 输出 Markdown
+7. **视频导出 CLI**
+
+   * `render-globe.ts` (Puppeteer) 录帧 → `encode-video.ts` (FFmpeg)
+8. **CI/CD 完整化**
+
+   * 补充 `pages.yml`、`release.yml`、ESLint Action
+9. **离线/在线模式切换**
+
+   * 在 `vite.config.ts` 完整配置 `VITE_BUILD_MODE`
+10. **算法扩展（可选）**
+
+* 交通方式分类、轨迹聚类、离线 CLIP 地标识别
+
+---
+
+*End of Context*

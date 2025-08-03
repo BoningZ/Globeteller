@@ -1,0 +1,16 @@
+{
+  "title": "Demo Trip",
+  "language": "zh",
+  "segments": [
+    {
+      "coordinates": [
+        [116.4, 39.9],
+        [121.47, 31.23],
+        [139.69, 35.68]
+      ],
+      "time": "2024-08-01T00:00:00Z",
+      "transport": "plane",
+      "note": "北京 → 上海 → 东京"
+    }
+  ]
+} 
